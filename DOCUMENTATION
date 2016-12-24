@@ -1,0 +1,78 @@
+            \\\///
+           / _  _ \
+         (| (.)(.) |)
+.------.OOOo--()--oOOO.------.
+|                            |
+|  chromium-sandbox-manager  |
+|                            |
+|            v0.1            |
+|                            |
+|        thewisenerd         |
+| thewisenerd@protonmail.com |
+|                            |
+'------.oooO-----------------'
+        (   )   Oooo.
+         \ (    (   )
+          \_)    ) /
+                (_/
+
+About:
+    chromium-sandbox-manager is used to simplify chromium sandboxing using firejail.
+
+Usage:
+    chromium-sandbox-manager init [INIT_OPTIONS]
+        Start a new sandboxed chrome instance.
+    chromium-sandbox-manager list
+        List running sandboxed chrome instances.
+    chromium-sandbox-manager help
+        Show this text.
+    chromium-sandbox-manager version
+        Show version information.
+
+INIT_OPTIONS:
+    --args args
+        extra args to add
+        example:
+            --args "--user-data-dir=path_to_user_data_dir"
+            --args "--no-sandbox" --args "--verbose"
+    --appimage path_to_appImage
+        path to AppImage (if exists, will be used)
+    --private
+        creates a private sandbox instance
+    --fireprofiles path_to_firejail_profiles_dir
+        define path to directory where firejail profiles are stored.
+        use if you have an unstandard (or manual) firejail installation.
+        defaults to "/etc/firejail".
+    --scripts-path path_to_additional_scripts
+        add path to look for scripts in
+        defaults to look at where chromium-sandbox-manager resides.
+        follows similarly to bash $PATH, give ':' delimited values, example:
+            --scripts-path "/path1:/path2"
+        or, you may use:
+            --scripts-path "/path1" --scripts-path "/path2"
+        unreadable paths are silently ignored.
+    --load script_name1[,script_name2,script_name3,...]
+        load helper scripts
+        give either comma-separated values like:
+            --load "script_name1,script_name2"
+        or separate values
+            --load "script_name1" --load "script_name2"
+        inexistent scripts are silently ignored.
+    --chrome
+        use "~/.config/google-chrome/Default" for user data directory
+        instead of "~/.config/chromium/Default".
+        to be used with --appimage
+    --verbose
+        be more verbose.
+
+Examples:
+    csm init
+        creates new instance
+    csm init --private
+        creates new 'private' instance
+    csm init --load gtk2,buku
+        creates new instance with 'gtk2' and 'buku' scripts enabled
+    csm init --appimage ~/Downloads/Chromium-55.0.2843.0-x86_64.AppImage --args "--no-sandbox"
+        creates new instance with appimage and arguments "--no-sandbox"
+
+License GPL version 2
