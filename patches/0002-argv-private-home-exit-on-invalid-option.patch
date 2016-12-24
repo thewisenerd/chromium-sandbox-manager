@@ -1,0 +1,27 @@
+From 37f26776d7c0c4eb8529a03376d5e9102c0c5d5f Mon Sep 17 00:00:00 2001
+From: thewisenerd <thewisenerd@protonmail.com>
+Date: Sat, 24 Dec 2016 06:46:42 +0530
+Subject: [PATCH 2/5] argv: private-home: exit on invalid option
+
+---
+ src/firejail/main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/firejail/main.c b/src/firejail/main.c
+index 15820f7..f9742cc 100644
+--- a/src/firejail/main.c
++++ b/src/firejail/main.c
+@@ -1500,6 +1500,10 @@ int main(int argc, char **argv) {
+ 				}
+ 				
+ 				// extract private home dirname
++				if (*(argv[i] + 15) == '\0') {
++					fprintf(stderr, "Error: invalid private-home option\n");
++					exit(1);
++				}
+ 				cfg.home_private_keep = argv[i] + 15;
+ 				arg_private = 1;
+ 			}
+-- 
+2.10.2
+
