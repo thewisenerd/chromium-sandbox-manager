@@ -1,0 +1,10 @@
+{
+	"userSettings": {
+		"advancedUserEnabled": true,
+		"webrtcIPAddressHidden": true
+	},
+	"dynamicFilteringString": [
+		"behind-the-scene * 3p noop",
+		"behind-the-scene * 3p-frame noop"
+	]
+}

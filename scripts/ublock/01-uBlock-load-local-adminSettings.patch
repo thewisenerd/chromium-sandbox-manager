@@ -1,0 +1,41 @@
+--- dist/build/uBlock0.chromium/js/storage.js
++++ dist/build/uBlock0.chromium/js/storage.js
+@@ -934,7 +934,37 @@
+         callback();
+     };
+ 
+-    vAPI.adminStorage.getItem('adminSettings', onRead);
++    var adminSettingsPatch = function(json) {
++        if (json == undefined) {
++            µBlock.assets.getLocal('assets/ublock/adminSettings.json', function(details) {
++                var pstr = details.content;
++                if ( typeof pstr === 'string' && pstr !== '' ) {
++                    try {
++                        var data = JSON.parse(pstr);
++                    } catch (ex) {
++                        console.error(ex);
++                    }
++                }
++
++                if ( typeof data !== 'object' || data === null ) {
++                    onRead();
++                    return;
++                }
++
++                /* fix dynamicFilteringString */
++                if ( typeof data.dynamicFilteringString == 'object' && Array.isArray(data.dynamicFilteringString) ) {
++                    data.dynamicFilteringString = data.dynamicFilteringString.join('\n');
++                }
++
++                onRead(JSON.stringify(data));
++
++            }); // getLocal
++        } else { // someday i'll revisit this and do recursive merge
++            onRead(json);
++        }
++    } // adminSettingsPatch
++
++    vAPI.adminStorage.getItem('adminSettings', adminSettingsPatch);
+ };
+ 
+ /******************************************************************************/

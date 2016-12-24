@@ -37,8 +37,12 @@ fi
 
 tools/make-chromium.sh > /dev/null
 
-
-# todo: my patches
+local __assets="${1}/ublock"
+patch -t -p0 < "${__assets}/01-uBlock-load-local-adminSettings.patch" > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+	logv_warn "patching uBlock failed.\n"
+fi
+cp "${__assets}/uBlockadminSettings.json" "${__build}/assets/ublock/adminSettings.json"
 
 register_extension "${__name}" "${__build}"
 
