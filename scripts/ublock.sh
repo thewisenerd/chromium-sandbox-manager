@@ -5,6 +5,8 @@ local __path="${csm_extensions_dir}/${__dir}"
 
 local __name="uBlock0.chromium"
 local __build="${__path}/dist/build/uBlock0.chromium"
+local __dest="${CSM_HOME}/${CSM_EXTS_DIR}/${__name}"
+
 
 if [ "$(test_folder_read "${__path}")" == "1" ]; then
 	logv_warn "${__path} not readable, skip loading ${__name}\n"
@@ -37,14 +39,14 @@ fi
 
 tools/make-chromium.sh > /dev/null
 
+register_extension "${__name}" "${__build}"
+
 local __assets="${1}/ublock"
-patch -t -p0 < "${__assets}/01-uBlock-load-local-adminSettings.patch" > /dev/null 2>&1
+patch -t -p0 -d "${__dest}" < "${__assets}/01-uBlock-load-local-adminSettings.patch" > /dev/null 2>&1
 if [ $? -ne 0 ]; then
 	logv_warn "patching uBlock failed.\n"
 fi
-cp "${__assets}/uBlockadminSettings.json" "${__build}/assets/ublock/adminSettings.json"
-
-register_extension "${__name}" "${__build}"
+cp "${__assets}/uBlockadminSettings.json" "${__dest}/assets/ublock/adminSettings.json"
 
 # restore cwd
 cd ${CSM_PWD}

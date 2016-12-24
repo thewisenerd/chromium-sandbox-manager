@@ -1,5 +1,5 @@
---- dist/build/uBlock0.chromium/js/storage.js
-+++ dist/build/uBlock0.chromium/js/storage.js
+--- js/storage.js
++++ js/storage.js
 @@ -934,7 +934,37 @@
          callback();
      };
