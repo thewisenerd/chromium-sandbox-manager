@@ -1,0 +1,23 @@
+--- JS/YouTubePlus.user.js
++++ JS/YouTubePlus.user.js
+@@ -2058,6 +2058,20 @@
+                 firstTime       : true,
+                 volLev          : 50,
+                 advOpts         : true,
++                /* my settings */
++                GEN_DSBL_ADS    : true,
++                GEN_REM_APUN    : true,
++                GEN_CHN_DFLT_PAGE : "videos",
++                GEN_GRID_SUBS   : true,
++                GEN_GRID_SRCH   : true,
++                GEN_BTTR_NTF    : true,
++                GEN_HIDE_FTR    : true,
++                GEN_HDE_CHN_SDBR: true,
++                VID_PLR_ADS     : true,
++                VID_DFLT_QLTY   : "medium",
++                VID_LAYT_AUTO_PNL: true,
++                firstTime       : false,
++                /* my settings (end) */
+                 blacklist       : {}
+             };
+             language = {
