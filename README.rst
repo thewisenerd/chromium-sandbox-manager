@@ -25,8 +25,8 @@ installing
 
  - put the tarball in a directory where you have permissions, and extract sources::
 
-     xz -cd chrome-sandbox-manager-0.X.tar.xz | tar -xvf -
+     xz -cd chromium-sandbox-manager-0.X.tar.xz | tar -xvf -
 
  - add said directory to your $PATH variable, and run::
 
-     chrome-sandbox-manager
+     chromium-sandbox-manager
