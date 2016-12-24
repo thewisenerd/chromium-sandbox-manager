@@ -1,0 +1,612 @@
+#!/usr/bin/env bash
+
+# Copyright (C) 2016 thewisenerd <thewisenerd@protonmail.com>. All Rights Reserved.
+# This file is licensed under the GPLv2. Please see COPYING for more information.
+
+text_bold() {
+	if [ -z ${NO_SGR+x} ]; then
+		echo -ne "\033[1m$@\033[22m"
+	else
+		echo -ne "$@"
+	fi
+}
+
+text_italic() {
+	if [ -z ${NO_SGR+x} ]; then
+		echo -ne "\033[3m$@\033[23m"
+	else
+		echo -ne "$@"
+	fi
+}
+
+log() {
+	echo -ne "$@"
+}
+
+log_info() {
+	if [ -z ${NO_SGR+x} ]; then
+		echo -ne "\033[37m$(text_bold "info:") $@\033[0m"
+	else
+		echo -ne "info: $@"
+	fi
+}
+
+log_warn() {
+	if [ -z ${NO_SGR+x} ]; then
+		echo -ne "\033[33m$(text_bold "warning:") $@\033[0m"
+	else
+		echo -ne "fatal: $@"
+	fi
+}
+
+log_fatal() {
+	if [ -z ${NO_SGR+x} ]; then
+		echo -ne "\033[31m\033[1mfatal:\033[22m $@\033[0m"
+	else
+		echo -ne "fatal: $@"
+	fi
+}
+
+logv() {
+	if [ ${verbose} -ne 0 ]; then
+		log "$@"
+	fi
+}
+logv_info() {
+	if [ ${verbose} -ne 0 ]; then
+		log_info "$@"
+	fi
+}
+logv_warn() {
+	if [ ${verbose} -ne 0 ]; then
+		log_warn "$@"
+	fi
+}
+logv_fatal() {
+	# log fatal irrespective of verbosity
+	log_fatal "$@"
+}
+
+test_file_read() {
+	if [ -e "${1}" -a -f "${1}" -a -s "${1}" -a -r "${1}" ]; then
+		echo -n "0";
+	else
+		echo -n "1";
+	fi
+}
+test_file_execute() {
+	if [ -x "${1}" ]; then
+		echo -n "0";
+	else
+		echo -n "1";
+	fi
+}
+test_folder_read() {
+	if [ -e "${1}" -a -d "${1}" -a -r "${1}" ]; then
+		echo -n "0";
+	else
+		echo -n "1";
+	fi
+}
+
+# containsElement code taken from http://stackoverflow.com/a/8574392;
+# thanks, patrik!
+containsElement () {
+	local e
+	for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+	return 1
+}
+
+deleteElement() {
+	local varr="$2"[@]
+	let index=0
+	for e in ${!varr}; do
+		[[ "$e" == "$1" ]] && unset $2[$index]; # black magic. jk.
+		let index++
+	done
+}
+
+# q: how bored am I today?
+
+cmd_version_0() {
+	cat <<-"_EOF"
+            \\\///
+           / _  _ \
+         (| (.)(.) |)
+.------.OOOo--()--oOOO.------.
+|                            |
+|  chromium-sandbox-manager  |
+|                            |
+|            v0.1            |
+|                            |
+|        thewisenerd         |
+| thewisenerd@protonmail.com |
+|                            |
+'------.oooO-----------------'
+        (   )   Oooo.
+         \ (    (   )
+          \_)    ) /
+                (_/
+	_EOF
+}
+
+cmd_version_1() {
+	cat <<-"_EOF"
+            /\             /\
+           |`\\_,--="=--,_//`|
+           \ ."  :'. .':  ". /
+          ==)  _ :  '  : _  (==
+            |>/O\   _   /O\<|
+            | \-"~` _ `~"-/ |
+           >|`===. \_/ .===`|<
+     .-"-.   \==='  |  '===/   .-"-.
+.---{'. '`}---\,  .-'-.  ,/---{.'. '}---.
+ )  `"---"`     `~-===-~`     `"---"`  (
+(       chromium-sandbox-manager        )
+ )                                     (
+(                 v0.1                  )
+ )                                     (
+(              thewisenerd              )
+ )     thewisenerd@protonmail.com      (
+'---------------------------------------'
+	_EOF
+}
+
+cmd_version_2() {
+	cat <<-"_EOF"
+          __   _,--="=--,_   __
+         /  \."    .-.    "./  \
+        /  ,/  _   : :   _  \/` \
+        \  `| /o\  :_:  /o\ |\__/
+         `-'| :="~` _ `~"=: |
+            \`     (_)     `/
+     .-"-.   \      |      /   .-"-.
+.---{     }--|  /,.-'-.,\  |--{     }---.
+ )  (_)_)_)  \_/`~-===-~`\_/  (_(_(_)  (
+(       chromium-sandbox-manager        )
+ )                                     (
+(                 v0.1                  )
+ )                                     (
+(              thewisenerd              )
+ )     thewisenerd@protonmail.com      (
+'---------------------------------------'
+	_EOF
+}
+
+cmd_version_3() {
+	cat <<-"_EOF"
+/*       _\|/_
+         (o o)
+ +----oOO-{_}-OOo-----------+
+ | chromium-sandbox-manager |
+ |                          |
+ |           v0.1           |
+ |                          |
+ |       thewisenerd        |
+ |thewisenerd@protonmail.com|
+ +-------------------------*/
+	_EOF
+}
+
+cmd_version_4() {
+	cat <<-"_EOF"
+         _ ._  _ , _ ._
+       (_ ' ( `  )_  .__)
+     ( (  (    )   `)  ) _)
+    (__ (_   (_ . _) _) ,__)
+        `~~`\ ' . /`~~`
+        ,::: ;   ; :::,
+       ':::::::::::::::'
+ __jgs______/_ __ \__________
+|                            |
+|  chromium-sandbox-manager  |
+|                            |
+|            v0.1            |
+|                            |
+|        thewisenerd         |
+| thewisenerd@protonmail.com |
+|____________________________|
+	_EOF
+}
+
+cmd_version_5() {
+	cat <<-"_EOF"
+        .--,       .--,
+       ( (  \.---./  ) )
+        '.__/o   o\__.'
+           {=  ^  =}
+            >  -  <
+ _______.""`-------`"".______
+/                            \
+\  chromium-sandbox-manager  /
+/                            \
+\            v0.1            /
+/                            \
+\        thewisenerd         /
+/ thewisenerd@protonmail.com \
+\____________________________/
+         ___)( )(___
+        (((__) (__)))
+	_EOF
+}
+
+cmd_version_6() {
+	cat <<-"_EOF"
+,-- [ chromium-sandbox-manager ]
+|
+| v0.1
+|
+| thewisenerd
+| thewisenerd@protonmail.com
+`----
+	_EOF
+}
+
+cmd_version() {
+	SEED=$(head -1 /dev/urandom | od -N 1 | awk '{ print $2 }'| sed s/^0*//)
+	RANDOM=$SEED
+	let "number = $RANDOM % 7"
+	eval cmd_version_${number}
+}
+
+# a: ... quite very.
+
+cmd_usage() {
+	cmd_version
+	echo
+	read -d '' String <<-_EOF
+	$(text_italic "About:")
+	    $PROGRAM is used to simplify chromium sandboxing using firejail.
+
+	$(text_italic "Usage:")
+	    $PROGRAM $(text_bold "init") [INIT_OPTIONS]
+	        Start a new sandboxed chrome instance.
+	    $PROGRAM $(text_bold "list")
+	        List running sandboxed chrome instances.
+	    $PROGRAM $(text_bold "help")
+	        Show this text.
+	    $PROGRAM $(text_bold "version")
+	        Show version information.
+
+	$(text_italic "INIT_OPTIONS:")
+	    $(text_bold "--args") $(text_italic args)
+	        extra args to add
+	        example:
+	            --args "--user-data-dir=$(text_italic path_to_user_data_dir)"
+	            --args "--no-sandbox" --args "--verbose"
+	    $(text_bold "--appimage") $(text_italic path_to_appImage)
+	        path to AppImage (if exists, will be used)
+	    $(text_bold "--private")
+	        creates a private sandbox instance
+	    $(text_bold "--fireprofiles") $(text_italic path_to_firejail_profiles_dir)
+	        define path to directory where firejail profiles are stored.
+	        use if you have an unstandard (or manual) firejail installation.
+	        defaults to "${fireprofiles_dir}".
+	    $(text_bold "--scripts-path") $(text_italic path_to_additional_scripts)
+	        add path to look for scripts in
+	        defaults to look at where $PROGRAM resides.
+	        follows similarly to bash \$PATH, give ':' delimited values, example:
+	            --scripts-path "/path1:/path2"
+	        or, you may use:
+	            --scripts-path "/path1" --scripts-path "/path2"
+	        unreadable paths are silently ignored.
+	    $(text_bold "--load") $(text_italic script_name1[,script_name2,script_name3,...])
+	        load helper scripts
+	        give either comma-separated values like:
+	            --load "script_name1,script_name2"
+	        or separate values
+	            --load "script_name1" --load "script_name2"
+	        inexistent scripts are silently ignored.
+	    $(text_bold "--chrome")
+	        use "~/.config/google-chrome/Default" for user data directory
+	        instead of "~/.config/chromium/Default".
+	        to be used with --appimage
+	    $(text_bold "--verbose")
+	        be more verbose.
+
+	$(text_italic "Examples:")
+	    csm init
+	        creates new instance
+	    csm init --private
+	        creates new 'private' instance
+	    csm init --load gtk2,buku
+	        creates new instance with 'gtk2' and 'buku' scripts enabled
+	    csm init --appimage ~/Downloads/Chromium-55.0.2843.0-x86_64.AppImage --args "--no-sandbox"
+	        creates new instance with appimage and arguments "--no-sandbox"
+
+	License GPL version 2
+
+	_EOF
+	echo -e "$String"
+}
+
+### GLOBALS
+CSM_PATH=$(cd $(dirname "$0") && pwd -P)
+
+appimage=""
+private=0
+verbose=0
+ischrome=0
+sandbox_args=()
+fireprofiles_dir="/etc/firejail"
+userscripts=( 'dummy' )
+scripts_path="${CSM_PATH}/scripts"
+extras=( )
+post_init_hooks=( )
+
+CSM_FNAME="csm_instance$RANDOM"
+CSM_HOME="${HOME}"
+CSM_PWD="$( pwd )"
+CSM_PROFILE="$( mktemp -t tmp.XXXXXXXXXX.profile )"
+CSM_BIN="" # to set
+CSM_USER_DATA_DIR="" # to be set
+
+# TODO: redefine these with _standard_ values?
+ERR_MISSING_ARG=-1
+ERR_APPIMAGE_NOREAD=-2
+ERR_APPIMAGE_NOEXECUTE=-3
+ERR_FIREPROFILES_NOREAD=-4
+ERR_NO_RUNTIME=-5
+
+### GLOBALS (END)
+
+cmd__set_chromium_bin() {
+	local bins_a=( "chromium" "chromium-browser" )
+	for bin in ${bins_a[@]}; do
+		which "${bin}" > /dev/null 2>&1
+		if [ $? -eq 0 ]; then
+			CSM_BIN="${bin}"
+			CSM_USER_DATA_DIR=".config/chromium/Default"
+			break
+		fi
+	done
+	local bins_b=( "chrome" "google-chrome" )
+	for bin in ${bins_b[@]}; do
+		which "${bin}" > /dev/null 2>&1
+		if [ $? -eq 0 ]; then
+			CSM_BIN="${bin}"
+			CSM_USER_DATA_DIR=".config/google-chrome/Default"
+			ischrome=1;
+			break
+		fi
+	done
+
+	if [[ "${CSM_BIN}" == "" ]]; then
+		logv_fatal "chrome runtime not found in \$PATH\n"
+		exit $ERR_NO_RUNTIME
+	fi
+}
+
+cmd__load_script() {
+	for path in ${scripts_path[@]}; do
+		local scriptfile="${path}/${1}.sh"
+		if [ "$(test_file_read "${scriptfile}")" == "0" ]; then
+			source ${scriptfile} "${path}"
+			break;
+		fi
+	done
+}
+
+cmd__load_userscripts() {
+	for script in ${userscripts[@]}; do
+		for path in ${scripts_path[@]}; do
+			local scriptfile="${path}/${script}.sh"
+			if [ "$(test_file_read "${scriptfile}")" == "1" ]; then
+				continue;
+			fi
+			source ${scriptfile} "${path}"
+			break;
+		done # for path
+	done # for script
+}
+
+cmd_get_pid_from_name() {
+	echo $( firejail --list | grep "\-\-name=${1}" | cut -d':' -f1 )
+}
+
+cmd_post_init_hooks() {
+	local pid=$( cmd_get_pid_from_name "${CSM_FNAME}" )
+	for hook in "${post_init_hooks[@]}"; do
+		IFS=' ' read -r -a array <<< "${hook}"
+		local builder=()
+		builder+=( "firejail" )
+		builder+=( "--join=${pid}" )
+		for arg in ${array[@]}; do
+			builder+=( "${arg}" )
+		done
+		logv_info "running post init hook : ${hook[@]}\n"
+		if [ $verbose -ne 0 ]; then
+			( "${builder[@]}" ) >> /tmp/${CSM_FNAME}.out 2>> /tmp/${CSM_FNAME}.err &
+		else
+			( "${builder[@]}" ) > /dev/null 2>&1 &
+		fi
+	done
+}
+
+cmd_run() {
+
+	# chromium path
+	if [[ "${appimage}" == "" ]]; then
+		cmd__set_chromium_bin
+	else
+		if [ $ischrome -ne 0 ]; then
+			CSM_USER_DATA_DIR=".config/google-chrome/Default"
+		else
+			CSM_USER_DATA_DIR=".config/chromium/Default"
+		fi
+	fi
+
+	CSM_HOME=$( mktemp -d ) # make directory in /tmp
+
+	# run userscripts
+	cmd__load_userscripts
+
+	# include chromium.profile to $CSM_PROFILE
+	cat >> ${CSM_PROFILE} <<-_EOF
+
+	# chromium browser profile
+	include /usr/local/etc/firejail/chromium.profile
+	_EOF
+
+	# build commandline
+	args=()
+
+	args+=( "firejail" )
+	args+=( "--name=${CSM_FNAME}" )
+
+	if [ $private -ne 0 ]; then
+		args+=( "--private" )
+	fi
+
+	args+=( "--profile=${CSM_PROFILE}" )
+
+	if [ $verbose -eq 0 ]; then
+		args+=( "--quiet" )
+	fi
+
+	if [[ "${appimage}" == "" ]]; then
+		args+=( "${CSM_BIN}" )
+	else
+		args+=( "--appimage" )
+		args+=( "${appimage}" )
+	fi
+
+	for arg in "${sandbox_args[@]}"; do
+		args+=( "${arg}" )
+	done
+
+	if [ $verbose -eq 0 ]; then
+		( "${args[@]}" ) > /dev/null 2>&1 &
+	else
+		log_info "exec: "
+		for arg in "${args[@]}"; do
+			log "'${arg}' "
+		done
+		logv "\n"
+		( "${args[@]}" ) > /tmp/${CSM_FNAME}.out 2> /tmp/${CSM_FNAME}.err &
+	fi
+	log_info "started instance: ${CSM_FNAME}\n"
+
+}
+
+cmd_init() {
+	COMMAND="$1"
+	while :; do
+		case "$1" in
+			--appimage)
+				if [ $# -le 1 ]; then
+					logv_fatal "--appimage requires argument\n"
+					exit $ERR_MISSING_ARG
+				else
+					shift;
+					if [ "$(test_file_read "${1}")" == "1" ]; then
+						logv_fatal "${1} not readable\n"
+						exit $ERR_APPIMAGE_NOREAD
+					else
+						if [ "$(test_file_execute "${1}")" == "1" ]; then
+							logv_fatal "${1} not executable\n"
+							exit $ERR_APPIMAGE_NOEXECUTE
+						fi
+						appimage="${1}"
+					fi
+				fi ;;
+			--private) private=1 ;;
+			--verbose) verbose=1 ;;
+			--chrome)  ischrome=1 ;;
+			--args) shift; sandbox_args+=( "${1}" ) ;;
+			--fireprofiles)
+				if [ $# -le 1 ]; then
+					logv_fatal "--fireprofiles requires argument\n"
+					exit $ERR_MISSING_ARG
+				else
+					shift;
+					if [ "$(test_folder_read "${1}")" == "1" ]; then
+						logv_fatal "${1} not readable\n"
+						exit $ERR_FIREPROFILES_NOREAD
+					else
+						if [ "$(test_file_read "${1}/chromium.profile")" == "1" ]; then
+							logv_fatal "${1}/chromium.profile not readable\n"
+							exit $ERR_FIREPROFILES_NOREAD
+						else
+							fireprofiles_dir="${1}"
+						fi
+					fi
+				fi ;;
+			--scripts-path)
+				if [ $# -le 1 ]; then
+					log_warn "--scripts-path needs argument, no argument provided. skipping.\n"
+				else
+					shift;
+					IFS=':' read -ra PATHS <<< "${1}"
+					for path in "${PATHS[@]}"; do
+						# if folder unreadable, continue
+						if [ "$(test_folder_read "${path}")" == "1" ]; then
+							continue
+						fi
+
+						# delete path if exists
+						containsElement "${path}" "${scripts_path[@]}"
+						if [ $? -eq 0 ]; then
+							deleteElement "${path}" scripts_path
+						fi
+
+						# prepend path for user script precedence
+						scripts_path=( "${path}" "${scripts_path[@]}" )
+					done
+				fi ;;
+			--load)
+				if [ $# -le 1 ]; then
+					log_warn "--load needs argument, no argument provided. skipping.\n"
+				else
+					shift;
+					IFS=',' read -ra SCRIPTS <<< "${1}"
+					for script in "${SCRIPTS[@]}"; do
+						# do not load a script more than once.
+						containsElement "${script}" "${userscripts[@]}"
+						if [ $? -eq 1 ]; then
+							userscripts+=( "${script}" )
+						fi
+					done
+				fi ;;
+			-?*) extras+=( "${1}" ) ;;
+			*) break;
+		esac
+		shift;
+	done
+
+	# if didn't bail by now, safe to proceed
+	cmd_run
+
+	# if didn't exit by now, run post init hooks
+	sleep 1 # wait some time for init
+	cmd_post_init_hooks
+}
+
+cmd_list() {
+	local IFS=$'\n'
+	arr=$( firejail --list | sort | grep --color=none "\-\-name=csm_instance" | grep --color=none "$( whoami )" )
+	for p in ${arr[@]}; do
+		pid=$( echo ${p} | cut -d':' -f1 )
+		name=$( echo ${p} | grep -oE "\-\-name=csm_instance[0-9]*" | grep -oE "csm_instance[0-9]*" )
+		args=$( echo ${p} | cut -d' ' -f3- )
+
+		if [ -z ${NO_SGR+x} ]; then
+			echo -ne "\033[37m$(text_bold "${name}\t::\t${pid}") :: ${args}\033[0m\n"
+		else
+			echo -ne "${name} :: ${pid} :: ${args}\n"
+		fi
+
+	done
+}
+
+PROGRAM="${0##*/}"
+COMMAND="$1"
+
+case "$1" in
+	init|--init) shift;		cmd_init "$@" ;;
+	list|--list) shift;		cmd_list "$@" ;;
+	help|--help) shift;		cmd_usage "$@" ;;
+	version|--version) shift;	cmd_version "$@" ;;
+	*) COMMAND="help";		cmd_usage "$@" ;;
+esac
+exit 0
