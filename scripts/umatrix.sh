@@ -37,7 +37,18 @@ fi
 
 tools/make-chromium.sh > /dev/null
 
-# todo: my patches
+
+# copy current uMatrix settings
+uMsqlPath="${HOME}/.mozilla/firefox/user.default/extension-data/umatrix.sqlite"
+local __assets="${1}/umatrix"
+if [[ "$(test_file_read "${uMsqlPath}" )" == "0" ]]; then
+	patch -t -p0 < "${__assets}/01-uMatrix-load-userMatrix.patch" > /dev/null 2>&1
+	if [ $? -ne 0 ]; then
+		logv_warn "patching uMatrix failed.\n"
+	fi
+
+	sqlite3 ${uMsqlPath} "select value from settings where name = \"userMatrix\";" | sed s/^\"//g | sed s/\"\$//g | sed s/"\\\\n"/"\n"/g > ${__build}/assets/umatrix/userMatrix.txt
+fi
 
 register_extension "${__name}" "${__build}"
 

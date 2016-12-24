@@ -1,0 +1,19 @@
+--- dist/build/uMatrix.chromium/js/storage.js
++++ dist/build/uMatrix.chromium/js/storage.js
+@@ -82,6 +82,16 @@
+             µm.pMatrix.fromString(bin.userMatrix);
+             µm.tMatrix.assign(µm.pMatrix);
+             callback();
++        } else { // someday i'll revisit this and do recursive merge
++            µm.assets.getLocal('assets/umatrix/userMatrix.txt', function(details) {
++                if ( typeof details.content == 'string' && details.content != '' ) {
++                    µm.pMatrix.fromString(details.content);
++                    µm.tMatrix.assign(µm.pMatrix);
++                    callback();
++                }
++            }, function(err) {
++                // console.log("could not load userMatrix");
++            });
+         }
+     };
+     this.XAL.keyvalGetOne('userMatrix', onLoaded);
